@@ -9,7 +9,6 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space
 export const metadata: Metadata = {
   title: 'Sense - Training Planner Pro',
   description: 'Plan and manage your weekly training with Sense. Create multiple training plans, track your workouts, and stay on top of your fitness goals.',
-  generator: 'v0.app',
   icons: {
     icon: [
       {
