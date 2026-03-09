@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model sessions {
+  id                 Int       @id @default(autoincrement())
+  user_id            Int
+  refresh_token_hash String    @db.VarChar(255)
+  ip_address         String?   @db.VarChar(45)
+  user_agent         String?   @db.VarChar(255)
+  created_at         DateTime  @default(now()) @db.Timestamp(6)
+  expires_at         DateTime  @db.Timestamp(6)
+  revoked_at         DateTime? @db.Timestamp(6)
+  users              users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_sessions_user")
+
+  @@index([expires_at], map: "idx_sessions_expires_at")
+  @@index([user_id], map: "idx_sessions_user_id")
+}
+
+model training_day {
+  id                Int                 @id @default(autoincrement())
+  training_plan_id  Int
+  day_name          String?             @db.VarChar(100)
+  is_rest           Boolean?            @default(false)
+  training_plan     training_plan       @relation(fields: [training_plan_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_training_day_plan")
+  training_exercise training_exercise[]
+  workout_sessions  workout_sessions[]
+
+  @@index([training_plan_id], map: "idx_training_day_plan_id")
+}
+
+model training_exercise {
+  id              Int          @id @default(autoincrement())
+  training_day_id Int
+  name            String       @db.VarChar(255)
+  sets            Int?
+  reps            String?      @db.VarChar(50)
+  notes           String?
+  rest_seconds    Int?
+  order_index     Int?
+  training_day    training_day @relation(fields: [training_day_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_training_exercise_day")
+
+  @@index([training_day_id], map: "idx_training_exercise_day_id")
+}
+
+model training_plan {
+  id           Int            @id @default(autoincrement())
+  user_id      Int
+  name         String         @db.VarChar(255)
+  description  String?
+  color        String?        @db.VarChar(50)
+  icon         String?        @db.VarChar(50)
+  created_at   DateTime       @default(now()) @db.Timestamp(6)
+  training_day training_day[]
+  users        users          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_training_plan_user")
+
+  @@index([user_id], map: "idx_training_plan_user_id")
+}
+
+model users {
+  id               Int                @id @default(autoincrement())
+  name             String?            @db.VarChar(255)
+  email            String             @unique @db.VarChar(255)
+  password_hash    String             @db.VarChar(255)
+  created_at       DateTime           @default(now()) @db.Timestamp(6)
+  last_login_at    DateTime?          @db.Timestamp(6)
+  sessions         sessions[]
+  training_plan    training_plan[]
+  workout_sessions workout_sessions[]
+
+  @@index([email], map: "idx_users_email")
+}
+
+model workout_exercises {
+  id                 Int              @id @default(autoincrement())
+  workout_session_id Int
+  name               String           @db.VarChar(255)
+  order_index        Int?
+  workout_sessions   workout_sessions @relation(fields: [workout_session_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_workout_exercise_session")
+  workout_sets       workout_sets[]
+
+  @@index([workout_session_id], map: "idx_workout_exercises_session_id")
+}
+
+model workout_sessions {
+  id                Int                 @id @default(autoincrement())
+  user_id           Int
+  training_day_id   Int?
+  started_at        DateTime            @db.Timestamp(6)
+  finished_at       DateTime?           @db.Timestamp(6)
+  duration_seconds  Int?
+  created_at        DateTime            @default(now()) @db.Timestamp(6)
+  workout_exercises workout_exercises[]
+  training_day      training_day?       @relation(fields: [training_day_id], references: [id], onUpdate: NoAction, map: "fk_workout_sessions_day")
+  users             users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_workout_sessions_user")
+
+  @@index([started_at], map: "idx_workout_sessions_started_at")
+  @@index([user_id], map: "idx_workout_sessions_user_id")
+}
+
+model workout_sets {
+  id                  Int               @id @default(autoincrement())
+  workout_exercise_id Int
+  set_number          Int?
+  reps                Int?
+  weight              Decimal?          @db.Decimal(6, 2)
+  rir                 Int?
+  completed           Boolean?          @default(false)
+  created_at          DateTime          @default(now()) @db.Timestamp(6)
+  workout_exercises   workout_exercises @relation(fields: [workout_exercise_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_workout_sets_exercise")
+
+  @@index([workout_exercise_id], map: "idx_workout_sets_exercise_id")
+}

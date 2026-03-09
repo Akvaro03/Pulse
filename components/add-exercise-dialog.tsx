@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,11 +8,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import type { DayOfWeek } from "@/lib/training-store"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { DayOfWeek } from "@/lib/training-store";
 
 export function AddExerciseDialog({
   open,
@@ -20,40 +20,50 @@ export function AddExerciseDialog({
   onSubmit,
   dayName,
 }: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSubmit: (exercise: { name: string; sets?: number; reps?: string; duration?: string; notes?: string }) => void
-  dayName: DayOfWeek
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (exercise: {
+    name: string;
+    sets?: number;
+    reps?: string;
+    rest_seconds?: number;
+    order_index?: number;
+    notes?: string;
+  }) => void;
+  dayName: DayOfWeek;
 }) {
-  const [name, setName] = useState("")
-  const [sets, setSets] = useState("")
-  const [reps, setReps] = useState("")
-  const [duration, setDuration] = useState("")
-  const [notes, setNotes] = useState("")
+  const [name, setName] = useState("");
+  const [sets, setSets] = useState("");
+  const [reps, setReps] = useState("");
+  const [rest_seconds, setRest_seconds] = useState("");
+  const [order_index, setOrder_index] = useState("");
+  const [notes, setNotes] = useState("");
 
   const handleOpenChange = (value: boolean) => {
     if (!value) {
-      setName("")
-      setSets("")
-      setReps("")
-      setDuration("")
-      setNotes("")
+      setName("");
+      setSets("");
+      setReps("");
+      setRest_seconds("");
+      setOrder_index("");
+      setNotes("");
     }
-    onOpenChange(value)
-  }
+    onOpenChange(value);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim()) return
+    e.preventDefault();
+    if (!name.trim()) return;
     onSubmit({
       name: name.trim(),
       sets: sets ? parseInt(sets) : undefined,
       reps: reps || undefined,
-      duration: duration || undefined,
+      rest_seconds: rest_seconds ? parseInt(rest_seconds) : undefined,
+      order_index: order_index ? parseInt(order_index) : undefined,
       notes: notes || undefined,
-    })
-    handleOpenChange(false)
-  }
+    });
+    handleOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -68,7 +78,9 @@ export function AddExerciseDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="exercise-name" className="text-foreground">Nombre del ejercicio</Label>
+            <Label htmlFor="exercise-name" className="text-foreground">
+              Nombre del ejercicio
+            </Label>
             <Input
               id="exercise-name"
               placeholder="Ej: Press de banca"
@@ -80,7 +92,9 @@ export function AddExerciseDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="exercise-sets" className="text-foreground">Series</Label>
+              <Label htmlFor="exercise-sets" className="text-foreground">
+                Series
+              </Label>
               <Input
                 id="exercise-sets"
                 type="number"
@@ -92,7 +106,9 @@ export function AddExerciseDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="exercise-reps" className="text-foreground">Repeticiones</Label>
+              <Label htmlFor="exercise-reps" className="text-foreground">
+                Repeticiones
+              </Label>
               <Input
                 id="exercise-reps"
                 placeholder="8-10"
@@ -103,17 +119,21 @@ export function AddExerciseDialog({
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="exercise-duration" className="text-foreground">Duracion (opcional)</Label>
+            <Label htmlFor="exercise-duration" className="text-foreground">
+              Descanso entre sets (opcional)
+            </Label>
             <Input
               id="exercise-duration"
               placeholder="Ej: 5 min"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
+              value={rest_seconds}
+              onChange={(e) => setRest_seconds(e.target.value)}
               className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="exercise-notes" className="text-foreground">Notas (opcional)</Label>
+            <Label htmlFor="exercise-notes" className="text-foreground">
+              Notas (opcional)
+            </Label>
             <Input
               id="exercise-notes"
               placeholder="Ej: Aumentar peso progresivamente"
@@ -142,5 +162,5 @@ export function AddExerciseDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

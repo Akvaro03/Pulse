@@ -1,9 +1,9 @@
 "use client"
 
 import { Dumbbell, Pencil, Trash2, ChevronRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { PLAN_COLORS, type TrainingPlan, DAYS_OF_WEEK } from "@/lib/training-store"
+import { PLAN_COLORS, DAYS_OF_WEEK } from "@/lib/training-store"
+import { TrainingPlanFull } from "@/src/features/plans/plan.types"
 
 function getColorConfig(color: string) {
   return PLAN_COLORS.find((c) => c.value === color) || PLAN_COLORS[0]
@@ -15,14 +15,14 @@ export function PlanCard({
   onEdit,
   onDelete,
 }: {
-  plan: TrainingPlan
-  onSelect: (plan: TrainingPlan) => void
-  onEdit: (plan: TrainingPlan) => void
-  onDelete: (planId: string) => void
+  plan: TrainingPlanFull
+  onSelect: (plan: TrainingPlanFull) => void
+  onEdit: (plan: TrainingPlanFull) => void
+  onDelete: (planId: number) => void
 }) {
-  const colorConfig = getColorConfig(plan.color)
-  const activeDays = plan.days.filter((d) => !d.isRest && d.exercises.length > 0)
-  const totalExercises = plan.days.reduce((sum, d) => sum + d.exercises.length, 0)
+  const colorConfig = getColorConfig(plan.color || "")
+  const activeDays = plan.training_day.filter((d) => !d.is_rest && d.training_exercise.length > 0)
+  const totalExercises = plan.training_day.reduce((sum, d) => sum + d.training_exercise.length, 0)
 
   return (
     <div
@@ -87,8 +87,8 @@ export function PlanCard({
 
         <div className="mt-3 flex items-center gap-1">
           {DAYS_OF_WEEK.map((day) => {
-            const dayPlan = plan.days.find((d) => d.day === day)
-            const isActive = dayPlan && !dayPlan.isRest && dayPlan.exercises.length > 0
+            const dayPlan = plan.training_day.find((d) => d.day_name === day)
+            const isActive = dayPlan && !dayPlan.is_rest && dayPlan.training_exercise.length > 0
             const shortDays: Record<string, string> = {
               Lunes: "L",
               Martes: "M",

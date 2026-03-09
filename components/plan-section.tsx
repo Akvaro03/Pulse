@@ -1,13 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Plus, LayoutGrid } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { PlanCard } from "@/components/plan-card"
-import { PlanDetail } from "@/components/plan-detail"
-import { CreatePlanDialog } from "@/components/create-plan-dialog"
-import type { TrainingPlan, PlanColor, DayOfWeek } from "@/lib/training-store"
-import { toast } from "sonner"
+import { useState } from "react";
+import { Plus, LayoutGrid } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PlanCard } from "@/components/plan-card";
+import { PlanDetail } from "@/components/plan-detail";
+import { CreatePlanDialog } from "@/components/create-plan-dialog";
+import type { DayOfWeek } from "@/lib/training-store";
+import { toast } from "sonner";
+import axios from "axios";
+import { TrainingPlanFull } from "@/src/features/plans/plan.types";
 
 export function PlansSection({
   plans,
@@ -18,22 +20,47 @@ export function PlansSection({
   onRemoveExercise,
   onToggleRest,
 }: {
-  plans: TrainingPlan[]
-  onAddPlan: (data: { name: string; description: string; color: PlanColor; icon: string }) => void
-  onUpdatePlan: (planId: string, data: { name: string; description: string; color: PlanColor; icon: string }) => void
-  onDeletePlan: (planId: string) => void
-  onAddExercise: (planId: string, day: DayOfWeek, exercise: { name: string; sets?: number; reps?: string; duration?: string; notes?: string }) => void
-  onRemoveExercise: (planId: string, day: DayOfWeek, exerciseId: string) => void
-  onToggleRest: (planId: string, day: DayOfWeek, isRest: boolean) => void
+  plans: TrainingPlanFull[];
+  onAddPlan: (data: {
+    name: string;
+    description: string;
+    color: string;
+    icon: string;
+  }) => void;
+  onUpdatePlan: (
+    planId: number,
+    data: { name: string; description: string; color: string; icon: string },
+  ) => void;
+  onDeletePlan: (planId: number) => void;
+  onAddExercise: (
+    planId: number,
+    day: DayOfWeek,
+    exercise: {
+      name: string;
+      sets?: number;
+      reps?: string;
+      notes?: string;
+      rest_seconds?: number;
+      order_index?: number;
+    },
+  ) => void;
+  onRemoveExercise: (
+    planId: number,
+    day: DayOfWeek,
+    exerciseId: number,
+  ) => void;
+  onToggleRest: (planId: number, day: DayOfWeek, isRest: boolean) => void;
 }) {
-  const [selectedPlan, setSelectedPlan] = useState<TrainingPlan | null>(null)
-  const [createDialogOpen, setCreateDialogOpen] = useState(false)
-  const [editingPlan, setEditingPlan] = useState<TrainingPlan | null>(null)
+  const [selectedPlan, setSelectedPlan] = useState<TrainingPlanFull | null>(
+    null,
+  );
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<TrainingPlanFull | null>(null);
 
   // Keep the selected plan in sync with store updates
   const activePlan = selectedPlan
     ? plans.find((p) => p.id === selectedPlan.id) || null
-    : null
+    : null;
 
   if (activePlan) {
     return (
@@ -46,7 +73,7 @@ export function PlansSection({
           onToggleRest={onToggleRest}
         />
       </section>
-    )
+    );
   }
 
   return (
@@ -61,8 +88,8 @@ export function PlansSection({
         <Button
           size="sm"
           onClick={() => {
-            setEditingPlan(null)
-            setCreateDialogOpen(true)
+            setEditingPlan(null);
+            setCreateDialogOpen(true);
           }}
           className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
@@ -78,12 +105,12 @@ export function PlansSection({
             plan={plan}
             onSelect={(p) => setSelectedPlan(p)}
             onEdit={(p) => {
-              setEditingPlan(p)
-              setCreateDialogOpen(true)
+              setEditingPlan(p);
+              setCreateDialogOpen(true);
             }}
             onDelete={(id) => {
-              onDeletePlan(id)
-              toast.success("Plan eliminado")
+              onDeletePlan(id);
+              toast.success("Plan eliminado");
             }}
           />
         ))}
@@ -102,8 +129,8 @@ export function PlansSection({
             size="sm"
             className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => {
-              setEditingPlan(null)
-              setCreateDialogOpen(true)
+              setEditingPlan(null);
+              setCreateDialogOpen(true);
             }}
           >
             <Plus className="mr-1 size-3.5" />
@@ -116,16 +143,17 @@ export function PlansSection({
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         editingPlan={editingPlan}
-        onSubmit={(data) => {
+        onSubmit={async (data) => {
           if (editingPlan) {
-            onUpdatePlan(editingPlan.id, data)
-            toast.success("Plan actualizado")
+            onUpdatePlan(editingPlan.id, data);
+            toast.success("Plan actualizado");
           } else {
-            onAddPlan(data)
-            toast.success("Plan creado")
+            onAddPlan(data);
+            await axios.post(`/api/plan/addPlan`, data);
+            toast.success("Plan creado");
           }
         }}
       />
     </section>
-  )
+  );
 }

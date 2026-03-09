@@ -2,7 +2,7 @@
 
 import { CalendarDays, Dumbbell, Moon, Timer, ChevronRight, Activity } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { PLAN_COLORS, type TrainingPlan, type DayPlan, DAYS_OF_WEEK, DAY_INDEX_MAP } from "@/lib/training-store"
+import { PLAN_COLORS, type TrainingPlan, type DayPlan, DAYS_OF_WEEK } from "@/lib/training-store"
 
 type TodayWorkout = {
   plan: TrainingPlan

@@ -12,7 +12,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PLAN_COLORS, type PlanColor, type TrainingPlan } from "@/lib/training-store"
+import { PLAN_COLORS} from "@/lib/training-store"
+import { TrainingPlanFull } from "@/src/features/plans/plan.types"
 
 export function CreatePlanDialog({
   open,
@@ -22,12 +23,12 @@ export function CreatePlanDialog({
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit: (data: { name: string; description: string; color: PlanColor; icon: string }) => void
-  editingPlan?: TrainingPlan | null
+  onSubmit: (data: { name: string; description: string; color: string; icon: string }) => void
+  editingPlan?: TrainingPlanFull | null
 }) {
   const [name, setName] = useState(editingPlan?.name ?? "")
   const [description, setDescription] = useState(editingPlan?.description ?? "")
-  const [color, setColor] = useState<PlanColor>(editingPlan?.color ?? "emerald")
+  const [color, setColor] = useState<string>(editingPlan?.color ?? "emerald")
 
   const handleOpenChange = (value: boolean) => {
     if (!value) {

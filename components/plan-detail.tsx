@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   ArrowLeft,
   Dumbbell,
@@ -10,19 +10,19 @@ import {
   Timer,
   Activity,
   StickyNote,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   PLAN_COLORS,
   DAYS_OF_WEEK,
-  type TrainingPlan,
   type DayOfWeek,
-} from "@/lib/training-store"
-import { AddExerciseDialog } from "@/components/add-exercise-dialog"
+  PlanColor,
+} from "@/lib/training-store";
+import { AddExerciseDialog } from "@/components/add-exercise-dialog";
+import { TrainingPlanFull } from "@/src/features/plans/plan.types";
 
 function getColorConfig(color: string) {
-  return PLAN_COLORS.find((c) => c.value === color) || PLAN_COLORS[0]
+  return PLAN_COLORS.find((c) => c.value === color) || PLAN_COLORS[0];
 }
 
 export function PlanDetail({
@@ -32,17 +32,33 @@ export function PlanDetail({
   onRemoveExercise,
   onToggleRest,
 }: {
-  plan: TrainingPlan
-  onBack: () => void
-  onAddExercise: (planId: string, day: DayOfWeek, exercise: { name: string; sets?: number; reps?: string; duration?: string; notes?: string }) => void
-  onRemoveExercise: (planId: string, day: DayOfWeek, exerciseId: string) => void
-  onToggleRest: (planId: string, day: DayOfWeek, isRest: boolean) => void
+  plan: TrainingPlanFull;
+  onBack: () => void;
+  onAddExercise: (
+    planId: number,
+    day: DayOfWeek,
+    exercise: {
+      name: string;
+      sets?: number;
+      reps?: string;
+      duration?: string;
+      notes?: string;
+    },
+  ) => void;
+  onRemoveExercise: (
+    planId: number,
+    day: DayOfWeek,
+    exerciseId: number,
+  ) => void;
+  onToggleRest: (planId: number, day: DayOfWeek, isRest: boolean) => void;
 }) {
-  const [addExerciseDay, setAddExerciseDay] = useState<DayOfWeek | null>(null)
-  const [selectedDay, setSelectedDay] = useState<DayOfWeek>(DAYS_OF_WEEK[0])
-  const colorConfig = getColorConfig(plan.color)
+  const [addExerciseDay, setAddExerciseDay] = useState<DayOfWeek | null>(null);
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek>(DAYS_OF_WEEK[0]);
+  const colorConfig = getColorConfig(plan.color as PlanColor);
 
-  const currentDayPlan = plan.days.find((d) => d.day === selectedDay)
+  const currentDayPlan = plan.training_day.find(
+    (d) => d.day_name === selectedDay,
+  );
 
   return (
     <div>
@@ -70,18 +86,19 @@ export function PlanDetail({
       {/* Day selector tabs */}
       <div className="mt-6 flex gap-1 overflow-x-auto pb-2">
         {DAYS_OF_WEEK.map((day) => {
-          const dayPlan = plan.days.find((d) => d.day === day)
-          const isActive = dayPlan && !dayPlan.isRest && dayPlan.exercises.length > 0
-          const isSelected = day === selectedDay
+          const dayPlan = plan.training_day.find((d) => d.day_name === day);
+          const isActive =
+            dayPlan && !dayPlan.is_rest && dayPlan.training_exercise.length > 0;
+          const isSelected = day === selectedDay;
           const shortDays: Record<string, string> = {
             Lunes: "LUN",
             Martes: "MAR",
-            "Miércoles": "MIE",
+            Miércoles: "MIE",
             Jueves: "JUE",
             Viernes: "VIE",
-            "Sábado": "SAB",
+            Sábado: "SAB",
             Domingo: "DOM",
-          }
+          };
 
           return (
             <button
@@ -100,7 +117,7 @@ export function PlanDetail({
                 <span className={`size-1 rounded-full ${colorConfig.class}`} />
               )}
             </button>
-          )
+          );
         })}
       </div>
 
@@ -109,7 +126,8 @@ export function PlanDetail({
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-foreground">{selectedDay}</h3>
           <div className="flex items-center gap-2">
-            {currentDayPlan?.isRest && currentDayPlan.exercises.length === 0 ? (
+            {currentDayPlan?.is_rest &&
+            currentDayPlan.training_exercise.length === 0 ? (
               <Button
                 size="sm"
                 variant="secondary"
@@ -145,8 +163,10 @@ export function PlanDetail({
         </div>
 
         <div className="mt-3 space-y-2">
-          {currentDayPlan && !currentDayPlan.isRest && currentDayPlan.exercises.length > 0 ? (
-            currentDayPlan.exercises.map((exercise, index) => (
+          {currentDayPlan &&
+          !currentDayPlan.is_rest &&
+          currentDayPlan.training_exercise.length > 0 ? (
+            currentDayPlan.training_exercise.map((exercise, index) => (
               <div
                 key={exercise.id}
                 className="group flex items-start gap-3 rounded-xl border border-border/30 bg-secondary/20 p-3 transition-colors hover:bg-secondary/40"
@@ -157,7 +177,9 @@ export function PlanDetail({
                   {index + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground text-sm">{exercise.name}</p>
+                  <p className="font-medium text-foreground text-sm">
+                    {exercise.name}
+                  </p>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     {exercise.sets && exercise.reps && (
                       <div className="flex items-center gap-1">
@@ -167,11 +189,11 @@ export function PlanDetail({
                         </span>
                       </div>
                     )}
-                    {exercise.duration && (
+                    {exercise.reps && (
                       <div className="flex items-center gap-1">
                         <Timer className="size-3 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground font-mono">
-                          {exercise.duration}
+                          {exercise.reps}
                         </span>
                       </div>
                     )}
@@ -189,7 +211,9 @@ export function PlanDetail({
                   variant="ghost"
                   size="icon"
                   className="size-6 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive shrink-0"
-                  onClick={() => onRemoveExercise(plan.id, selectedDay, exercise.id)}
+                  onClick={() =>
+                    onRemoveExercise(plan.id, selectedDay, exercise.id)
+                  }
                 >
                   <Trash2 className="size-3" />
                   <span className="sr-only">Eliminar ejercicio</span>
@@ -201,7 +225,9 @@ export function PlanDetail({
               <div className="rounded-full bg-secondary/50 p-3">
                 <Moon className="size-5 text-muted-foreground" />
               </div>
-              <p className="mt-3 text-sm font-medium text-foreground">Dia de descanso</p>
+              <p className="mt-3 text-sm font-medium text-foreground">
+                Dia de descanso
+              </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Agrega ejercicios para activar este dia
               </p>
@@ -213,15 +239,15 @@ export function PlanDetail({
       <AddExerciseDialog
         open={addExerciseDay !== null}
         onOpenChange={(open) => {
-          if (!open) setAddExerciseDay(null)
+          if (!open) setAddExerciseDay(null);
         }}
         onSubmit={(exercise) => {
           if (addExerciseDay) {
-            onAddExercise(plan.id, addExerciseDay, exercise)
+            onAddExercise(plan.id, addExerciseDay, exercise);
           }
         }}
         dayName={addExerciseDay || "Lunes"}
       />
     </div>
-  )
+  );
 }
