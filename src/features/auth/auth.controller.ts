@@ -1,8 +1,8 @@
-import { verifyPassword } from "@/src/utils/password";
-import { refreshSessionSchema } from "../plans/plans.schema";
+import { loginSchema, logoutSchema, registerSchema } from "./auth.schema";
 import createHeaderSession from "../session/createHeaderSession";
+import { refreshSessionSchema } from "../plans/plans.schema";
 import { SessionService } from "../session/session.service";
-import { loginSchema, registerSchema } from "./auth.schema";
+import { verifyPassword } from "@/src/utils/password";
 import { AuthService } from "./auth.service";
 import jwt from "jsonwebtoken";
 
@@ -37,6 +37,26 @@ export async function registerHandler(input: unknown) {
     return { status: 500, body: { error: "INTERNAL_ERROR" } };
   }
 }
+export async function logoutHandler(input: unknown) {
+  const parsed = logoutSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      status: 400,
+      body: { error: "INVALID_BODY", details: parsed.error },
+    };
+  }
+
+  try {
+    return await auth.logout(parsed.data);
+  } catch (e: unknown) {
+    // narrow the error to an object with an optional code string
+    const err = e as { code?: string };
+    if (err.code === "EMAIL_ALREADY_EXISTS") {
+      return { status: 409, body: { error: "EMAIL_ALREADY_EXISTS" } };
+    }
+    return { status: 500, body: { error: "INTERNAL_ERROR" } };
+  }
+}
 export async function loginHandler(input: unknown) {
   const parsed = loginSchema.safeParse(input);
   if (!parsed.success) {
@@ -52,6 +72,7 @@ export async function loginHandler(input: unknown) {
 
     const headers = createHeaderSession(accessToken, refreshToken);
 
+    console.log(headers);
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers,
@@ -103,4 +124,3 @@ export async function refreshSessionHandler(input: unknown) {
     return { status: 500, body: { error: "INTERNAL_ERROR" } };
   }
 }
-

@@ -5,14 +5,13 @@ export class PlansService {
   private plans = new PlanRepository();
 
   async addPlan(dto: AddPlanDTO) {
-    const created = await this.plans.createPlan({
+    return await this.plans.createPlan({
       color: dto.color,
       name: dto.name,
       description: dto.description,
       icon: dto.icon,
-      user_id: 13,
+      user_id: dto.userId,
     });
-    return created;
   }
 
   async updatePlan(dto: UpdatePlanDTO) {

@@ -6,7 +6,11 @@ import jwt from "jsonwebtoken";
 export async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
-  if (!accessToken && !refreshToken) {
+  const isLoginPage = request.nextUrl.pathname.startsWith("/login");
+  if (accessToken && refreshToken && isLoginPage) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+  if (!accessToken && !refreshToken && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
   try {
@@ -22,8 +26,11 @@ export async function proxy(request: NextRequest) {
       request: { headers },
     });
   } catch {
-    if (!refreshToken) {
+    if (!refreshToken && !isLoginPage) {
       return NextResponse.redirect(new URL("/login", request.url));
+    }
+    if (!refreshToken && isLoginPage) {
+      return NextResponse.next();
     }
 
     // llamar endpoint de refresh
@@ -48,5 +55,12 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/api/plan", "/api/day/today", "/api/plan/addPlan"],
+  matcher: [
+    "/",
+    "/login",
+    "/api/plan",
+    "/api/day/today",
+    "/api/plan/addPlan",
+    "/api/auth/logout",
+  ],
 };

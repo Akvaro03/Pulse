@@ -1,29 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import { Zap, Eye, EyeOff, ArrowRight, User, Mail, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios, { Axios } from "axios";
+import { useRouter } from "next/navigation";
+import register from "@/db/register";
+import { useState } from "react";
+import login from "@/db/login";
 
 type AuthMode = "login" | "register";
 
 export default function AuthPage() {
-  const [mode, setMode] = useState<AuthMode>("login");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [mode, setMode] = useState<AuthMode>("login");
   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [name, setName] = useState("");
+  const router = useRouter();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (mode === "register") {
         if (!name.trim()) {
           setError("Introduce tu nombre");
@@ -40,40 +43,25 @@ export default function AuthPage() {
           setLoading(false);
           return;
         }
-        const result = axios
-          .post("/api/auth/register", {
-            name: name.trim(),
-            email: email.trim(),
-            password,
-          })
-          .then((res) => {
-            console.log("Registro exitoso:", res.data);
-          });
 
-        // if (!result.ok) {
-        //   setError(result.error || "Error al crear la cuenta");
-        // }
+        await register({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        });
+        router.replace("/");
       } else {
         if (!email.trim() || !password) {
           setError("Completa todos los campos");
           setLoading(false);
           return;
         }
-        const result = axios
-          .post("/api/auth/login", {
-            email: email.trim(),
-            password,
-          })
-          .then((res) => {
-            console.log("Inicio de sesion exitoso:", res.data);
-          })
-          .catch((res) => {
-            console.log("Hubo un error ", res);
-          });
+        await login({
+          email: email.trim(),
+          password,
+        });
 
-        // if (!result.ok) {
-        //   setError(result.error || "Error al iniciar sesion");
-        // }
+        router.replace("/");
       }
       setLoading(false);
     }, 400);

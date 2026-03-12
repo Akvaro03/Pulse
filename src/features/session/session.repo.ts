@@ -9,6 +9,13 @@ export class SessionRepository {
       },
     });
   }
+  async deleteSessionsByUserId(data: { user_id: number }) {
+    return prisma.sessions.deleteMany({
+      where: {
+        user_id: data.user_id,
+      },
+    });
+  }
   async createSession(data: {
     id: number;
     refresh_token_hash: string;

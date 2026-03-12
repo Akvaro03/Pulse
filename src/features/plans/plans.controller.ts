@@ -9,7 +9,6 @@ import { PlansService } from "./plans.service";
 const plansService = new PlansService();
 
 export async function addPlanHandler(input: unknown) {
-  console.log(input);
   const parsed = AddPlanSchema.safeParse(input);
   if (!parsed.success) {
     return {

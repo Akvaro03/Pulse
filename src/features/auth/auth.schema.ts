@@ -14,3 +14,9 @@ export const loginSchema = z.object({
 });
 
 export type LoginDTO = z.infer<typeof loginSchema>;
+
+export const logoutSchema = z.object({
+  userId: z.number(),
+});
+
+export type LogoutDTO = z.infer<typeof logoutSchema>;

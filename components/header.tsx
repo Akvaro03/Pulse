@@ -1,8 +1,12 @@
-"use client"
+"use client";
 
-import { Zap } from "lucide-react"
+import Logout from "@/db/logout";
+import { Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function Header() {
+  const router = useRouter();
+
   return (
     <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="mx-auto max-w-6xl flex items-center justify-between px-4 py-4 md:px-6">
@@ -24,13 +28,21 @@ export function Header() {
             <span className="text-xs font-medium text-primary">Mis planes</span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2"
+          onClick={async () => {
+            try {
+              await Logout();
+              router.replace("/login");
+            } catch {}
+          }}
+        >
           <div className="hidden items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 md:flex">
             <span className="size-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-xs font-medium text-primary">Activo</span>
+            <span className="text-xs font-medium text-primary">Logout</span>
           </div>
         </div>
       </div>
     </header>
-  )
+  );
 }
