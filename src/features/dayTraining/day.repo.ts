@@ -1,3 +1,4 @@
+import getTodayName from "@/src/hooks/getTodayName";
 import prisma from "@/src/utils/prisma";
 
 export class DayRepository {
@@ -29,5 +30,21 @@ export class DayRepository {
         is_rest: isRest,
       },
     });
+  }
+  async getTodayDay(userId: number) {
+    const todayName = getTodayName();
+    const todayDay = await prisma.training_day.findMany({
+      where: {
+        day_name: todayName,
+        training_plan: {
+          user_id: userId,
+        },
+      },
+      include: { training_exercise: true, training_plan: true },
+    });
+    return todayDay.map((day) => ({
+      dayPlan: day,
+      plan: day.training_plan,
+    }));
   }
 }

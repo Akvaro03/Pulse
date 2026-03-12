@@ -1,7 +1,7 @@
 import axios from "axios";
-import {UpdatePlanDTO } from "@/src/features/plans/plans.schema";
+import {UpdatePlanClientDTO} from "@/src/features/plans/plans.schema";
 
-async function UpdatePlan( Plan: UpdatePlanDTO) {
+async function UpdatePlan( Plan: UpdatePlanClientDTO) {
   return axios
     .post("/api/plan/updatePlan", Plan)
     .then((res) => res.data)

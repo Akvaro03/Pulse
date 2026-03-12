@@ -1,24 +1,33 @@
-"use client"
+"use client";
 
-import { CalendarDays, Dumbbell, Moon, Timer, ChevronRight, Activity } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { PLAN_COLORS, type TrainingPlan, type DayPlan, DAYS_OF_WEEK } from "@/lib/training-store"
-
-type TodayWorkout = {
-  plan: TrainingPlan
-  dayPlan: DayPlan
-}
+import {
+  CalendarDays,
+  Dumbbell,
+  Moon,
+  Timer,
+  ChevronRight,
+  Activity,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  PLAN_COLORS,
+  DAYS_OF_WEEK,
+  PlanColor,
+} from "@/lib/training-store";
+import { training_plan } from "@/src/generated/prisma/client";
+import { TrainingDayFull } from "@/src/features/dayTraining/day.types";
+import getTodayName from "@/src/hooks/getTodayName";
 
 function getColorConfig(color: string) {
-  return PLAN_COLORS.find((c) => c.value === color) || PLAN_COLORS[0]
+  return PLAN_COLORS.find((c) => c.value === color) || PLAN_COLORS[0];
 }
 
 function WeekStrip({ todayName }: { todayName: string }) {
-  const shortDays = ["L", "M", "X", "J", "V", "S", "D"]
+  const shortDays = ["L", "M", "X", "J", "V", "S", "D"];
   return (
     <div className="flex items-center gap-1.5">
       {DAYS_OF_WEEK.map((day, i) => {
-        const isToday = day === todayName
+        const isToday = day === todayName;
         return (
           <div
             key={day}
@@ -30,17 +39,36 @@ function WeekStrip({ todayName }: { todayName: string }) {
           >
             {shortDays[i]}
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
 
-function WorkoutCard({ workout }: { workout: TodayWorkout }) {
-  const colorConfig = getColorConfig(workout.plan.color)
-  const totalExercises = workout.dayPlan.exercises.length
-  const totalSets = workout.dayPlan.exercises.reduce((sum, e) => sum + (e.sets || 0), 0)
+function WorkoutCard({
+  workout,
+}: {
+  workout: { dayPlan: TrainingDayFull; plan: training_plan };
+}) {
+  const colorConfig = getColorConfig(workout.plan.color as PlanColor);
+  const totalExercises = workout.dayPlan.training_exercise.length;
+  const totalSets = workout.dayPlan.training_exercise.reduce(
+    (sum, e) => sum + (e.sets || 0),
+    0,
+  );
+  const defaultRestTime = 30;
+  const secondsPerRep = 4;
+  const totalTime = workout.dayPlan.training_exercise
+    .map((ex) => {
+      const sets = ex.sets ?? 1;
+      const rest = ex.rest_seconds ?? defaultRestTime;
 
+      const reps = 8;
+      const setTime = reps * secondsPerRep;
+
+      return sets * setTime + (sets - 1) * rest;
+    })
+    .reduce((a, b) => a + b, 0);
   return (
     <div className="group rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-border hover:bg-card/80">
       <div className="flex items-start justify-between">
@@ -49,8 +77,12 @@ function WorkoutCard({ workout }: { workout: TodayWorkout }) {
             <Dumbbell className={`size-4 ${colorConfig.text}`} />
           </div>
           <div>
-            <h3 className="font-semibold text-foreground">{workout.plan.name}</h3>
-            <p className="text-sm text-muted-foreground">{workout.plan.description}</p>
+            <h3 className="font-semibold text-foreground">
+              {workout.plan.name}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {workout.plan.description}
+            </p>
           </div>
         </div>
         <ChevronRight className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
@@ -71,29 +103,47 @@ function WorkoutCard({ workout }: { workout: TodayWorkout }) {
             </span>
           </div>
         )}
+        {totalTime > 0 && (
+          <div className="flex items-center gap-1.5">
+            <Timer className="size-3.5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {(totalTime / 60).toFixed(0)} minutos total
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="mt-3 space-y-2">
-        {workout.dayPlan.exercises.map((exercise, index) => (
+        {workout.dayPlan.training_exercise.map((exercise, index) => (
           <div
             key={exercise.id}
             className="flex items-center gap-3 rounded-lg bg-secondary/30 px-3 py-2"
           >
-            <span className={`flex size-5 shrink-0 items-center justify-center rounded text-[10px] font-bold ${colorConfig.bg} ${colorConfig.text}`}>
+            <span
+              className={`flex size-5 shrink-0 items-center justify-center rounded text-[10px] font-bold ${colorConfig.bg} ${colorConfig.text}`}
+            >
               {index + 1}
             </span>
             <div className="flex-1 min-w-0">
-              <span className="text-sm font-medium text-foreground">{exercise.name}</span>
+              <span className="text-sm font-medium text-foreground">
+                {exercise.name}
+              </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {exercise.sets && exercise.reps && (
-                <Badge variant="secondary" className="text-[10px] font-mono bg-secondary text-secondary-foreground">
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] font-mono bg-secondary text-secondary-foreground"
+                >
                   {exercise.sets}x{exercise.reps}
                 </Badge>
               )}
-              {exercise.duration && (
-                <Badge variant="secondary" className="text-[10px] font-mono bg-secondary text-secondary-foreground">
-                  {exercise.duration}
+              {exercise.rest_seconds && (
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] font-mono bg-secondary text-secondary-foreground"
+                >
+                  {exercise.rest_seconds}s
                 </Badge>
               )}
             </div>
@@ -101,23 +151,21 @@ function WorkoutCard({ workout }: { workout: TodayWorkout }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export function TodayPanel({
-  workouts,
-  todayName,
+  todayPlans,
 }: {
-  workouts: TodayWorkout[]
-  todayName: string
+  todayPlans: { dayPlan: TrainingDayFull; plan: training_plan }[];
 }) {
-  const now = new Date()
+  const now = new Date();
   const dateString = now.toLocaleDateString("es-ES", {
     weekday: "long",
     day: "numeric",
     month: "long",
-  })
-
+  });
+  const todayName = getTodayName()
   return (
     <section>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -136,8 +184,8 @@ export function TodayPanel({
       </div>
 
       <div className="mt-6 space-y-4">
-        {workouts.length > 0 ? (
-          workouts.map(({ plan, dayPlan }) => (
+        {todayPlans.length > 0 ? (
+          todayPlans.map(({ dayPlan, plan }) => (
             <WorkoutCard key={plan.id} workout={{ plan, dayPlan }} />
           ))
         ) : (
@@ -155,5 +203,5 @@ export function TodayPanel({
         )}
       </div>
     </section>
-  )
+  );
 }

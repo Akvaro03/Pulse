@@ -10,7 +10,7 @@ export class PlansService {
       name: dto.name,
       description: dto.description,
       icon: dto.icon,
-      user_id: 1,
+      user_id: 13,
     });
     return created;
   }
@@ -19,8 +19,8 @@ export class PlansService {
     return await this.plans.updatePlan(dto);
   }
 
-  async getPlans() {
-    return await this.plans.getPlans();
+  async getPlans(userId: number) {
+    return await this.plans.getPlansByUserId(userId);
   }
   async deletePlan(planId: number) {
     return await this.plans.deletePlan(planId);

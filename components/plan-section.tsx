@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { CreatePlanDialog } from "@/components/create-plan-dialog";
+import { TrainingPlanFull } from "@/src/features/plans/plan.types";
+import { PlanDetail } from "@/components/plan-detail";
+import type { DayOfWeek } from "@/lib/training-store";
+import { PlanCard } from "@/components/plan-card";
 import { Plus, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlanCard } from "@/components/plan-card";
-import { PlanDetail } from "@/components/plan-detail";
-import { CreatePlanDialog } from "@/components/create-plan-dialog";
-import type { DayOfWeek } from "@/lib/training-store";
+import { useState } from "react";
 import { toast } from "sonner";
-import axios from "axios";
-import { TrainingPlanFull } from "@/src/features/plans/plan.types";
 
 export function PlansSection({
   plans,
@@ -149,7 +148,6 @@ export function PlansSection({
             toast.success("Plan actualizado");
           } else {
             onAddPlan(data);
-            await axios.post(`/api/plan/addPlan`, data);
             toast.success("Plan creado");
           }
         }}

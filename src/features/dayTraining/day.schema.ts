@@ -8,7 +8,6 @@ export const toggleRestDaySchema = z.object({
 });
 export type ToggleRestDayDTO = z.infer<typeof toggleRestDaySchema>;
 
-
 export const trainingDaySchema = z
   .object({
     day_name: z.string().max(100).optional(),
@@ -29,3 +28,7 @@ export const trainingDaySchema = z
       path: ["exercises"],
     },
   );
+export const getDayByIdSchema = z.object({
+  userId: z.number(),
+});
+export type getDayByIdDTO = z.infer<typeof getDayByIdSchema>;

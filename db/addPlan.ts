@@ -1,7 +1,7 @@
-import { AddPlanDTO } from "@/src/features/plans/plans.schema";
+import { AddPlanClientDTO } from "@/src/features/plans/plans.schema";
 import axios from "axios";
 
-async function AddPlan(Plan: AddPlanDTO) {
+async function AddPlan(Plan: AddPlanClientDTO) {
   return axios
     .post("/api/plan/addPlan", Plan)
     .then((res) => res.data)

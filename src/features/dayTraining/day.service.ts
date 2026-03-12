@@ -16,4 +16,7 @@ export class DayTrainingService {
     }
     return created;
   }
+  async getTodayDays(userId: number) {
+    return await this.dayRepository.getTodayDay(userId);
+  }
 }

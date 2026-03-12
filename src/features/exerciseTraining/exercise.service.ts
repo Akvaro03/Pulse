@@ -1,6 +1,6 @@
 import { DayRepository } from "../dayTraining/day.repo";
 import { ExerciseRepository } from "./exercise.repo";
-import { AddExerciseDTO } from "./plans.schema";
+import { AddExerciseDTO, DeleteExerciseDTO } from "./plans.schema";
 
 export class ExerciseService {
   private exerciseRepository = new ExerciseRepository();
@@ -30,5 +30,9 @@ export class ExerciseService {
       });
     }
     return dayExisted;
+  }
+
+  async deleteExercise(dto: DeleteExerciseDTO){
+    return this.exerciseRepository.deleteExercise(dto)
   }
 }

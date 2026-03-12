@@ -44,4 +44,13 @@ export class PlanRepository {
       orderBy: { created_at: "asc" },
     });
   }
+  async getPlansByUserId(userId: number) {
+    return await prisma.training_plan.findMany({
+      where: {
+        user_id: userId,
+      },
+      include: { training_day: { include: { training_exercise: true } } },
+      orderBy: { created_at: "asc" },
+    });
+  }
 }

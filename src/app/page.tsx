@@ -1,29 +1,23 @@
 "use client";
 
 import { PlansSection } from "@/components/plan-section";
-import { useTrainingStore } from "@/lib/training-store";
+import { useTodayPlans } from "../hooks/useTodayPlans";
 import { TodayPanel } from "@/components/today-panel";
-import ToggleRestDay from "@/db/toggleRestDay";
 import { Header } from "@/components/header";
-import DeletePlan from "@/db/deletePlan";
-import UpdatePlan from "@/db/updatePlan";
-import AddPlan from "@/db/addPlan";
 import { usePlans } from "../hooks/usePlans";
 
 export default function HomePage() {
-  const store = useTrainingStore();
-  const todayWorkouts = store.getTodayWorkouts();
-  const todayName = store.getTodayName();
-
   const {
-    plans,
-    addExerciseMutation,
+    deleteExerciseMutation,
     toggleRestDayMutation,
+    addExerciseMutation,
     deletePlanMutation,
     updatePlanMutation,
     addPlanMutation,
+    isLoading,
+    plans,
   } = usePlans();
-
+  const { todayPlans, isLoadingToday } = useTodayPlans();
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -31,32 +25,36 @@ export default function HomePage() {
         <div className="grid gap-8 lg:grid-cols-5">
           {/* Today's workouts - main focus */}
           <div className="lg:col-span-3">
-            <TodayPanel workouts={todayWorkouts} todayName={todayName} />
+            {todayPlans && !isLoadingToday && (
+              <TodayPanel todayPlans={todayPlans} />
+            )}
           </div>
 
           {/* Plans management - sidebar */}
           <div className="lg:col-span-2">
-            <PlansSection
-              plans={plans || []}
-              onAddPlan={(data) => addPlanMutation.mutate(data)}
-              onUpdatePlan={(id, data) =>
-                updatePlanMutation.mutate({ planId: id, ...data })
-              }
-              onDeletePlan={(id) => deletePlanMutation.mutate({ planId: id })}
-              onAddExercise={(planId, day, exercise) =>
-                addExerciseMutation.mutate({
-                  planId,
-                  day,
-                  exercise,
-                })
-              }
-              onRemoveExercise={(planId, day, exerciseId) =>
-                console.log(planId, day, exerciseId)
-              }
-              onToggleRest={(planId, day, isRest) =>
-                toggleRestDayMutation.mutate({ planId, day, isRest })
-              }
-            />
+            {plans && !isLoading && (
+              <PlansSection
+                plans={plans}
+                onAddPlan={(data) => addPlanMutation.mutate(data)}
+                onUpdatePlan={(id, data) =>
+                  updatePlanMutation.mutate({ planId: id, ...data })
+                }
+                onDeletePlan={(id) => deletePlanMutation.mutate({ planId: id })}
+                onAddExercise={(planId, day, exercise) =>
+                  addExerciseMutation.mutate({
+                    planId,
+                    day,
+                    exercise,
+                  })
+                }
+                onRemoveExercise={(planId, day, exerciseId) =>
+                  deleteExerciseMutation.mutate({ planId, day, exerciseId })
+                }
+                onToggleRest={(planId, day, isRest) =>
+                  toggleRestDayMutation.mutate({ planId, day, isRest })
+                }
+              />
+            )}
           </div>
         </div>
       </main>

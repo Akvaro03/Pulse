@@ -1,9 +1,15 @@
-import { AddPlanSchema, DeletePlanSchema, UpdatePlanSchema } from "./plans.schema";
+import {
+  AddPlanSchema,
+  DeletePlanSchema,
+  getPlansByIdSchema,
+  UpdatePlanSchema,
+} from "./plans.schema";
 import { PlansService } from "./plans.service";
 
 const plansService = new PlansService();
 
 export async function addPlanHandler(input: unknown) {
+  console.log(input);
   const parsed = AddPlanSchema.safeParse(input);
   if (!parsed.success) {
     return {
@@ -66,11 +72,19 @@ export async function deletePlanHandler(input: unknown) {
     return { status: 500, body: { error: "INTERNAL_ERROR" } };
   }
 }
-export async function getPlansHandler() {
+export async function getPlansHandler(input: unknown) {
   try {
-    const plans = await plansService.getPlans();
+    const parsed = getPlansByIdSchema.safeParse(input);
+    if (!parsed.success) {
+      return {
+        status: 400,
+        body: { error: "INVALID_BODY", details: parsed.error },
+      };
+    }
+    const plans = await plansService.getPlans(parsed.data?.userId);
+
     return { status: 200, body: plans };
-  } catch (e) {
+  } catch {
     return { status: 500, body: { error: "INTERNAL_ERROR" } };
   }
 }

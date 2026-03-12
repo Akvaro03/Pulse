@@ -2,6 +2,7 @@
 
 import AddExercise from "@/db/addExercise";
 import AddPlan from "@/db/addPlan";
+import DeleteExercise from "@/db/deleteExercise";
 import DeletePlan from "@/db/deletePlan";
 import ToggleRestDay from "@/db/toggleRestDay";
 import UpdatePlan from "@/db/updatePlan";
@@ -14,7 +15,16 @@ export function usePlans() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["plans"],
+        queryKey: ["plans", "plansToday"],
+      });
+    },
+  });
+  const deleteExerciseMutation = useMutation({
+    mutationFn: DeleteExercise,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["plans", "plansToday"],
       });
     },
   });
@@ -23,7 +33,7 @@ export function usePlans() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["plans"],
+        queryKey: ["plans", "plansToday"],
       });
     },
   });
@@ -32,7 +42,7 @@ export function usePlans() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["plans"],
+        queryKey: ["plans", "plansToday"],
       });
     },
   });
@@ -41,7 +51,7 @@ export function usePlans() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["plans"],
+        queryKey: ["plans", "plansToday"],
       });
     },
   });
@@ -50,16 +60,25 @@ export function usePlans() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["plans"],
+        queryKey: ["plans", "plansToday"],
       });
     },
   });
 
-  const { data: plans } = useQuery({
+  const { data: plans, isLoading } = useQuery({
     queryKey: ["plans"],
     queryFn: async () => await fetch("/api/plan").then((res) => res.json()),
     refetchInterval: 15000,
   });
 
-  return { plans, addExerciseMutation, toggleRestDayMutation, deletePlanMutation, updatePlanMutation, addPlanMutation };
+  return {
+    plans,
+    isLoading,
+    addPlanMutation,
+    updatePlanMutation,
+    deletePlanMutation,
+    addExerciseMutation,
+    toggleRestDayMutation,
+    deleteExerciseMutation,
+  };
 }

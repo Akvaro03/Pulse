@@ -66,6 +66,9 @@ export default function AuthPage() {
           })
           .then((res) => {
             console.log("Inicio de sesion exitoso:", res.data);
+          })
+          .catch((res) => {
+            console.log("Hubo un error ", res);
           });
 
         // if (!result.ok) {

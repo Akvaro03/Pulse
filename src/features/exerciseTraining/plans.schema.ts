@@ -13,6 +13,12 @@ export const AddExerciseSchema = z.object({
   }),
 });
 export type AddExerciseDTO = z.infer<typeof AddExerciseSchema>;
+export const DeleteExerciseSchema = z.object({
+  planId: z.number().int().positive(),
+  day: z.string().max(100),
+  exerciseId: z.number().int().positive(),
+});
+export type DeleteExerciseDTO = z.infer<typeof DeleteExerciseSchema>;
 
 export const trainingExerciseSchema = z.object({
   name: z.string().min(1, "Exercise name is required").max(255),

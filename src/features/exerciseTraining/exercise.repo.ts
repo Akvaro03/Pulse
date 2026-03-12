@@ -1,7 +1,11 @@
 import prisma from "@/src/utils/prisma";
-import { AddExerciseDTO } from "./plans.schema";
+import { AddExerciseDTO, DeleteExerciseDTO } from "./plans.schema";
 
 export class ExerciseRepository {
+  async deleteExercise(data:DeleteExerciseDTO){
+    return prisma.training_exercise.delete({where:{id:data.exerciseId}})
+  }
+  
   async createExercise(data: {
     dayId: number;
     exercise: AddExerciseDTO["exercise"];
