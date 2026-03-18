@@ -35,6 +35,12 @@ export const DeletePlanSchema = z.object({
 });
 export type DeletePlanDTO = z.infer<typeof DeletePlanSchema>;
 
+export const UpdateExerciseOrderSchema = z.object({
+  exerciseId: z.number(),
+  order_index: z.number()
+});
+export type UpdateExerciseOrderDTO = z.infer<typeof UpdateExerciseOrderSchema>;
+
 export const refreshSessionSchema = z.object({
   refreshToken: z.string(),
 });

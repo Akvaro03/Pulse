@@ -1,4 +1,5 @@
 import { DayRepository } from "../dayTraining/day.repo";
+import { UpdateExerciseOrderDTO } from "../plans/plans.schema";
 import { ExerciseRepository } from "./exercise.repo";
 import { AddExerciseDTO, DeleteExerciseDTO } from "./plans.schema";
 
@@ -35,4 +36,8 @@ export class ExerciseService {
   async deleteExercise(dto: DeleteExerciseDTO){
     return this.exerciseRepository.deleteExercise(dto)
   }
+  async editExerciseOrder(dto: UpdateExerciseOrderDTO){
+    return this.exerciseRepository.editExerciseOrder(dto)
+  }
+
 }

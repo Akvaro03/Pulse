@@ -40,7 +40,10 @@ export class DayRepository {
           user_id: userId,
         },
       },
-      include: { training_exercise: true, training_plan: true },
+      include: {
+        training_exercise: { orderBy: { order_index: "asc" } },
+        training_plan: true,
+      },
     });
     return todayDay.map((day) => ({
       dayPlan: day,

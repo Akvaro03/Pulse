@@ -5,8 +5,11 @@ import AddPlan from "@/db/addPlan";
 import DeleteExercise from "@/db/deleteExercise";
 import DeletePlan from "@/db/deletePlan";
 import ToggleRestDay from "@/db/toggleRestDay";
+import UpdateExerciseOrder from "@/db/updateExerciseOrder";
 import UpdatePlan from "@/db/updatePlan";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { training_exercise, training_plan } from "../generated/prisma/client";
+import { TrainingDayFull } from "../features/dayTraining/day.types";
 
 export function usePlans() {
   const queryClient = useQueryClient();
@@ -39,6 +42,35 @@ export function usePlans() {
     mutationFn: AddPlan,
     onSuccess: invalidatePlans,
   });
+  const updateExerciseOrderMutation = useMutation({
+    mutationFn: UpdateExerciseOrder,
+    onSuccess: invalidatePlans,
+    onMutate: async ({ exerciseId, order_index }) => {
+      // await queryClient.cancelQueries({ queryKey: ["plansToday"] });
+
+      const previousData = queryClient.getQueryData(["plansToday"]);
+      queryClient.setQueryData(
+        ["plansToday"],
+        (old: { dayPlan: TrainingDayFull; plan: training_plan }[]) => {
+          const planOld = old[0];
+          if (!planOld) return planOld;
+          // console.log(planOld?.dayPlan?.training_exercise);
+          return [{
+            ...planOld,
+            dayPlan: {
+              ...planOld.dayPlan,
+              training_exercise: reorderExercises(
+                planOld.dayPlan.training_exercise,
+                exerciseId,
+                order_index,
+              ),
+            },
+          }];
+        },
+      );
+      return { previousData };
+    },
+  });
 
   const { data: plans, isLoading } = useQuery({
     queryKey: ["plans"],
@@ -53,5 +85,17 @@ export function usePlans() {
     addExerciseMutation,
     toggleRestDayMutation,
     deleteExerciseMutation,
+    updateExerciseOrderMutation,
   };
+}
+function reorderExercises(
+  exercises: training_exercise[],
+  exerciseId: number,
+  newOrderIndex: number,
+) {
+  const updated = exercises.map((e) =>
+    e.id === exerciseId ? { ...e, order_index: newOrderIndex } : e,
+  );
+
+  return [...updated].sort((a, b) => a.order_index - b.order_index);
 }

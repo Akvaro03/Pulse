@@ -7,7 +7,7 @@ export const AddExerciseSchema = z.object({
     name: z.string().min(1).max(255),
     sets: z.number().int().min(1).max(20).optional(),
     reps: z.string().max(50).optional(),
-    notes: z.string().max(50).optional(),
+    notes: z.string().max(300).optional(),
     rest_seconds: z.number().int().min(0).max(600).optional(),
     order_index: z.number().int().min(0).optional(),
   }),

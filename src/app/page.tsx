@@ -2,12 +2,13 @@
 
 import { PlansSection } from "@/components/plan-section";
 import { useTodayPlans } from "../hooks/useTodayPlans";
-import { TodayPanel } from "@/components/today-panel";
 import { Header } from "@/components/header";
 import { usePlans } from "../hooks/usePlans";
+import TodayPanel from "@/components/todayPanel";
 
 export default function HomePage() {
   const {
+    updateExerciseOrderMutation,
     deleteExerciseMutation,
     toggleRestDayMutation,
     addExerciseMutation,
@@ -26,7 +27,15 @@ export default function HomePage() {
           {/* Today's workouts - main focus */}
           <div className="lg:col-span-3">
             {todayPlans && !isLoadingToday && (
-              <TodayPanel todayPlans={todayPlans} />
+              <TodayPanel
+                updateExerciseOrder={({ exerciseId, order_index }) =>
+                  updateExerciseOrderMutation.mutate({
+                    exerciseId,
+                    order_index,
+                  })
+                }
+                todayPlans={todayPlans}
+              />
             )}
           </div>
 
