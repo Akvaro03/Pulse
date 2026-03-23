@@ -28,7 +28,6 @@ function TodayPanel({
             <CalendarDays className="size-5 text-primary" />
             <h2 className="font-mono text-xl font-bold uppercase tracking-tight text-foreground">
               Hoy
-              {todayPlans.length}
             </h2>
           </div>
           <p className="mt-1 text-sm capitalize text-muted-foreground">
