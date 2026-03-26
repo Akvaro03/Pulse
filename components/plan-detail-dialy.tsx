@@ -211,6 +211,7 @@ export function PlanDetailDaily({
             onAddExercise(plan.id, "Viernes", exercise);
             onAddExercise(plan.id, "Sábado", exercise);
             onAddExercise(plan.id, "Domingo", exercise);
+            setIsAddExercise(false);
           }
         }}
         dayName={"Lunes"}
