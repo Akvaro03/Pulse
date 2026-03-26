@@ -19,7 +19,7 @@ import {
 import { AddExerciseDialog } from "@/components/add-exercise-dialog";
 import { TrainingPlanFull } from "@/src/features/plans/plan.types";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function getColorConfig(color: string) {
   return PLAN_COLORS.find((c) => c.value === color) || PLAN_COLORS[0];
@@ -104,7 +104,7 @@ export function PlanDetailDaily({
                   size="sm"
                   variant="secondary"
                   className="h-7 text-xs bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                  onClick={() => addExercise}
+                  onClick={addExercise}
                 >
                   <Plus className="mr-1 size-3" />
                   Agregar
@@ -174,7 +174,7 @@ export function PlanDetailDaily({
                   className="size-6 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive shrink-0"
                   onClick={() => {
                     onRemoveExercise(plan.id, "Lunes", exercise.id);
-                    }}
+                  }}
                 >
                   <Trash2 className="size-3" />
                   <span className="sr-only">Eliminar ejercicio</span>
