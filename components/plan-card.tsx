@@ -29,7 +29,11 @@ export function PlanCard({
   );
   return (
     <div
-      className="group relative rounded-xl border border-border/50 bg-card transition-all hover:border-border hover:bg-card/80 cursor-pointer"
+      className={`group relative rounded-xl border border-border/50 bg-card transition-all hover:border-border hover:bg-card/80 cursor-pointer hover:shadow-md hover:scale-[1.01] ${
+        plan.is_daily
+          ? "border-primary/40 bg-primary/5 hover:bg-primary/10"
+          : "border-border/50 bg-card hover:bg-card/80"
+      }`}
       onClick={() => onSelect(plan)}
       role="button"
       tabIndex={0}
@@ -43,8 +47,8 @@ export function PlanCard({
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className={`rounded-lg p-2.5 ${colorConfig.bg}`}>
-              <Dumbbell className={`size-4 ${colorConfig.text}`} />
+            <div className={`rounded-xl p-3 ${colorConfig.bg} shadow-sm`}>
+              <Dumbbell className={`size-5 ${colorConfig.text}`} />
             </div>
             <div>
               <h3 className="font-semibold text-foreground">{plan.name}</h3>
@@ -84,12 +88,14 @@ export function PlanCard({
         <div className="mt-4 flex items-center gap-4">
           {plan.is_daily ? (
             <>
-              <div className="hidden items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 md:flex">
-                <span className="text-xs font-medium text-primary">Diario</span>
-              </div>
+              <div className="flex items-center gap-2 rounded-full bg-primary/15 px-3 py-1.5 ring-1 ring-primary/30">
+                <span className="text-xs font-semibold text-primary tracking-wide">
+                  DIARIO
+                </span>
+              </div>{" "}
               <span className="text-xs text-muted-foreground">
-                {totalExercises / 7} ejercicios
-              </span>
+                {Math.round(totalExercises / 7)} por día
+              </span>{" "}
             </>
           ) : (
             <>
