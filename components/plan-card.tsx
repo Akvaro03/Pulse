@@ -82,45 +82,59 @@ export function PlanCard({
         </div>
 
         <div className="mt-4 flex items-center gap-4">
-          <span className="text-xs text-muted-foreground">
-            {activeDays.length} dias activos
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {totalExercises} ejercicios
-          </span>
-        </div>
-
-        <div className="mt-3 flex items-center gap-1">
-          {DAYS_OF_WEEK.map((day) => {
-            const dayPlan = plan.training_day.find((d) => d.day_name === day);
-            const isActive =
-              dayPlan &&
-              !dayPlan.is_rest &&
-              dayPlan.training_exercise.length > 0;
-            const shortDays: Record<string, string> = {
-              Lunes: "L",
-              Martes: "M",
-              Miércoles: "X",
-              Jueves: "J",
-              Viernes: "V",
-              Sábado: "S",
-              Domingo: "D",
-            };
-            return (
-              <span
-                key={day}
-                className={`flex size-7 items-center justify-center rounded-md text-[10px] font-semibold transition-colors ${
-                  isActive
-                    ? `${colorConfig.bg} ${colorConfig.text}`
-                    : "bg-secondary/30 text-muted-foreground/50"
-                }`}
-              >
-                {shortDays[day]}
+          {plan.is_daily ? (
+            <>
+              <div className="hidden items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 md:flex">
+                <span className="text-xs font-medium text-primary">Diario</span>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {totalExercises / 7} ejercicios
               </span>
-            );
-          })}
-          <ChevronRight className="ml-auto size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+            </>
+          ) : (
+            <>
+              <span className="text-xs text-muted-foreground">
+                {activeDays.length} dias activos
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {totalExercises} ejercicios
+              </span>
+            </>
+          )}
         </div>
+        {!plan.is_daily && (
+          <div className="mt-3 flex items-center gap-1">
+            {DAYS_OF_WEEK.map((day) => {
+              const dayPlan = plan.training_day.find((d) => d.day_name === day);
+              const isActive =
+                dayPlan &&
+                !dayPlan.is_rest &&
+                dayPlan.training_exercise.length > 0;
+              const shortDays: Record<string, string> = {
+                Lunes: "L",
+                Martes: "M",
+                Miércoles: "X",
+                Jueves: "J",
+                Viernes: "V",
+                Sábado: "S",
+                Domingo: "D",
+              };
+              return (
+                <span
+                  key={day}
+                  className={`flex size-7 items-center justify-center rounded-md text-[10px] font-semibold transition-colors ${
+                    isActive
+                      ? `${colorConfig.bg} ${colorConfig.text}`
+                      : "bg-secondary/30 text-muted-foreground/50"
+                  }`}
+                >
+                  {shortDays[day]}
+                </span>
+              );
+            })}
+            <ChevronRight className="ml-auto size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+          </div>
+        )}
       </div>
     </div>
   );

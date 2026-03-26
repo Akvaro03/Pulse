@@ -9,6 +9,7 @@ import { Plus, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PlanDetailDaily } from "./plan-detail-dialy";
 
 export function PlansSection({
   plans,
@@ -24,6 +25,7 @@ export function PlansSection({
     name: string;
     description: string;
     color: string;
+    isDaily: boolean;
     icon: string;
   }) => void;
   onUpdatePlan: (
@@ -60,8 +62,20 @@ export function PlansSection({
   const activePlan = selectedPlan
     ? plans.find((p) => p.id === selectedPlan.id) || null
     : null;
-
   if (activePlan) {
+    if (activePlan.is_daily) {
+      return (
+        <section>
+          <PlanDetailDaily
+            plan={activePlan}
+            onBack={() => setSelectedPlan(null)}
+            onAddExercise={onAddExercise}
+            onRemoveExercise={onRemoveExercise}
+            onToggleRest={onToggleRest}
+          />
+        </section>
+      );
+    }
     return (
       <section>
         <PlanDetail

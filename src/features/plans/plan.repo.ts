@@ -7,6 +7,7 @@ export class PlanRepository {
     color: string | undefined;
     user_id: number;
     description?: string;
+    isDaily?: boolean;
     icon?: string;
   }) {
     return await prisma.training_plan.create({
@@ -14,6 +15,7 @@ export class PlanRepository {
         name: data.name,
         color: data.color,
         user_id: data.user_id,
+        is_daily: data.isDaily,
         description: data.description,
         icon: data.icon,
       },

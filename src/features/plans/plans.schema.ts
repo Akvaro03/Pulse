@@ -7,6 +7,7 @@ export const AddPlanSchema = z.object({
   description: z.string().max(1000).optional(),
   color: z.string().max(50).optional(),
   icon: z.string().max(50).optional(),
+  isDaily: z.boolean().default(false).optional(),
   days: z.array(trainingDaySchema).max(14).optional(),
 });
 export const AddPlanClientSchema = AddPlanSchema.omit({

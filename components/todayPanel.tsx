@@ -1,10 +1,11 @@
 import { TrainingDayFull } from "@/src/features/dayTraining/day.types";
 import { training_plan } from "@/src/generated/prisma/client";
 import getTodayName from "@/src/hooks/getTodayName";
-import { CalendarDays, Moon } from "lucide-react";
+import { CalendarDays, LayoutGrid, Moon, Rows3 } from "lucide-react";
 import WeekStrip from "./weekStrip";
 import WorkoutCard from "./workoutCard";
 import { UpdateExerciseOrderDTO } from "@/src/features/plans/plans.schema";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 function TodayPanel({
   todayPlans,
@@ -34,6 +35,15 @@ function TodayPanel({
             {dateString}
           </p>
         </div>
+        <ToggleGroup variant="outline" type="single" defaultValue="a">
+          <ToggleGroupItem value="a" aria-label="Toggle bold">
+            <LayoutGrid />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="b" aria-label="Toggle italic">
+            <Rows3 />
+          </ToggleGroupItem>
+        </ToggleGroup>
+
         <WeekStrip todayName={todayName} />
       </div>
 

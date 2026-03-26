@@ -1,6 +1,5 @@
-"use client"
+"use client";
 
-import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -8,12 +7,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { PLAN_COLORS} from "@/lib/training-store"
-import { TrainingPlanFull } from "@/src/features/plans/plan.types"
+} from "@/components/ui/dialog";
+import { TrainingPlanFull } from "@/src/features/plans/plan.types";
+import { PLAN_COLORS } from "@/lib/training-store";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "./ui/switch";
+import { useState } from "react";
 
 export function CreatePlanDialog({
   open,
@@ -21,30 +22,45 @@ export function CreatePlanDialog({
   onSubmit,
   editingPlan,
 }: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSubmit: (data: { name: string; description: string; color: string; icon: string }) => void
-  editingPlan?: TrainingPlanFull | null
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: {
+    name: string;
+    description: string;
+    color: string;
+    isDaily: boolean;
+    icon: string;
+  }) => void;
+  editingPlan?: TrainingPlanFull | null;
 }) {
-  const [name, setName] = useState(editingPlan?.name ?? "")
-  const [description, setDescription] = useState(editingPlan?.description ?? "")
-  const [color, setColor] = useState<string>(editingPlan?.color ?? "emerald")
+  const [name, setName] = useState(editingPlan?.name ?? "");
+  const [isDaily, setIsDaily] = useState<boolean>(false);
+  const [description, setDescription] = useState(
+    editingPlan?.description ?? "",
+  );
+  const [color, setColor] = useState<string>(editingPlan?.color ?? "emerald");
 
   const handleOpenChange = (value: boolean) => {
     if (!value) {
-      setName(editingPlan?.name ?? "")
-      setDescription(editingPlan?.description ?? "")
-      setColor(editingPlan?.color ?? "emerald")
+      setName(editingPlan?.name ?? "");
+      setDescription(editingPlan?.description ?? "");
+      setColor(editingPlan?.color ?? "emerald");
     }
-    onOpenChange(value)
-  }
+    onOpenChange(value);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim()) return
-    onSubmit({ name: name.trim(), description: description.trim(), color, icon: "dumbbell" })
-    handleOpenChange(false)
-  }
+    e.preventDefault();
+    if (!name.trim()) return;
+    onSubmit({
+      description: description.trim(),
+      name: name.trim(),
+      isDaily: isDaily,
+      icon: "dumbbell",
+      color,
+    });
+    handleOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -60,8 +76,20 @@ export function CreatePlanDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-x-4 flex">
+            <Label htmlFor="plan-desc" className="text-foreground">
+              Es diario?
+            </Label>
+            <Switch
+              checked={isDaily}
+              id="airplane-mode"
+              onCheckedChange={setIsDaily}
+            />
+          </div>
           <div className="space-y-2">
-            <Label htmlFor="plan-name" className="text-foreground">Nombre del plan</Label>
+            <Label htmlFor="plan-name" className="text-foreground">
+              Nombre del plan
+            </Label>
             <Input
               id="plan-name"
               placeholder="Ej: Gimnasio - Fuerza"
@@ -72,7 +100,9 @@ export function CreatePlanDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="plan-desc" className="text-foreground">Descripcion</Label>
+            <Label htmlFor="plan-desc" className="text-foreground">
+              Descripcion
+            </Label>
             <Input
               id="plan-desc"
               placeholder="Ej: Entrenamiento de fuerza con pesas"
@@ -81,6 +111,7 @@ export function CreatePlanDialog({
               className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
             />
           </div>
+
           <div className="space-y-2">
             <Label className="text-foreground">Color</Label>
             <div className="flex items-center gap-2">
@@ -99,6 +130,7 @@ export function CreatePlanDialog({
               ))}
             </div>
           </div>
+
           <DialogFooter>
             <Button
               type="button"
@@ -119,5 +151,5 @@ export function CreatePlanDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

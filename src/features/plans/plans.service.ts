@@ -9,6 +9,7 @@ export class PlansService {
       color: dto.color,
       name: dto.name,
       description: dto.description,
+      isDaily: dto.isDaily,
       icon: dto.icon,
       user_id: dto.userId,
     });

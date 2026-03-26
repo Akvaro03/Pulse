@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   ArrowLeft,
   Dumbbell,
@@ -11,7 +10,6 @@ import {
   Activity,
   StickyNote,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   PLAN_COLORS,
   DAYS_OF_WEEK,
@@ -20,12 +18,13 @@ import {
 } from "@/lib/training-store";
 import { AddExerciseDialog } from "@/components/add-exercise-dialog";
 import { TrainingPlanFull } from "@/src/features/plans/plan.types";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 function getColorConfig(color: string) {
   return PLAN_COLORS.find((c) => c.value === color) || PLAN_COLORS[0];
 }
-
-export function PlanDetail({
+export function PlanDetailDaily({
   plan,
   onBack,
   onAddExercise,
@@ -52,15 +51,15 @@ export function PlanDetail({
   ) => void;
   onToggleRest: (planId: number, day: DayOfWeek, isRest: boolean) => void;
 }) {
-  console.log("detallado");
-  const [addExerciseDay, setAddExerciseDay] = useState<DayOfWeek | null>(null);
+  console.log("diario");
+  const [isAddExercise, setIsAddExercise] = useState<boolean>(false);
   const [selectedDay, setSelectedDay] = useState<DayOfWeek>(DAYS_OF_WEEK[0]);
   const colorConfig = getColorConfig(plan.color as PlanColor);
 
   const currentDayPlan = plan.training_day.find(
     (d) => d.day_name === selectedDay,
   );
-
+  const addExercise = () => setIsAddExercise(true);
   return (
     <div>
       <div className="flex items-center gap-3">
@@ -84,48 +83,9 @@ export function PlanDetail({
         </div>
       </div>
 
-      {/* Day selector tabs */}
-      <div className="mt-6 flex gap-1 overflow-x-auto pb-2">
-        {DAYS_OF_WEEK.map((day) => {
-          const dayPlan = plan.training_day.find((d) => d.day_name === day);
-          const isActive =
-            dayPlan && !dayPlan.is_rest && dayPlan.training_exercise.length > 0;
-          const isSelected = day === selectedDay;
-          const shortDays: Record<string, string> = {
-            Lunes: "LUN",
-            Martes: "MAR",
-            Miércoles: "MIE",
-            Jueves: "JUE",
-            Viernes: "VIE",
-            Sábado: "SAB",
-            Domingo: "DOM",
-          };
-
-          return (
-            <button
-              key={day}
-              onClick={() => setSelectedDay(day)}
-              className={`flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all min-w-[52px] ${
-                isSelected
-                  ? "bg-primary text-primary-foreground"
-                  : isActive
-                    ? `${colorConfig.bg} ${colorConfig.text}`
-                    : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
-              }`}
-            >
-              <span>{shortDays[day]}</span>
-              {isActive && !isSelected && (
-                <span className={`size-1 rounded-full ${colorConfig.class}`} />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
       {/* Day content */}
       <div className="mt-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-foreground">{selectedDay}</h3>
           <div className="flex items-center gap-2">
             {currentDayPlan?.is_rest &&
             currentDayPlan.training_exercise.length === 0 ? (
@@ -133,7 +93,7 @@ export function PlanDetail({
                 size="sm"
                 variant="secondary"
                 className="h-7 text-xs bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                onClick={() => setAddExerciseDay(selectedDay)}
+                onClick={addExercise}
               >
                 <Plus className="mr-1 size-3" />
                 Agregar ejercicio
@@ -144,7 +104,7 @@ export function PlanDetail({
                   size="sm"
                   variant="secondary"
                   className="h-7 text-xs bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                  onClick={() => setAddExerciseDay(selectedDay)}
+                  onClick={() => addExercise}
                 >
                   <Plus className="mr-1 size-3" />
                   Agregar
@@ -212,9 +172,9 @@ export function PlanDetail({
                   variant="ghost"
                   size="icon"
                   className="size-6 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive shrink-0"
-                  onClick={() =>
-                    onRemoveExercise(plan.id, selectedDay, exercise.id)
-                  }
+                  onClick={() => {
+                    onRemoveExercise(plan.id, "Lunes", exercise.id);
+                    }}
                 >
                   <Trash2 className="size-3" />
                   <span className="sr-only">Eliminar ejercicio</span>
@@ -238,16 +198,22 @@ export function PlanDetail({
       </div>
 
       <AddExerciseDialog
-        open={addExerciseDay !== null}
+        open={isAddExercise}
         onOpenChange={(open) => {
-          if (!open) setAddExerciseDay(null);
+          if (!open) console.log("no esta abierto");
         }}
         onSubmit={(exercise) => {
-          if (addExerciseDay) {
-            onAddExercise(plan.id, addExerciseDay, exercise);
+          if (isAddExercise) {
+            onAddExercise(plan.id, "Lunes", exercise);
+            onAddExercise(plan.id, "Martes", exercise);
+            onAddExercise(plan.id, "Miércoles", exercise);
+            onAddExercise(plan.id, "Jueves", exercise);
+            onAddExercise(plan.id, "Viernes", exercise);
+            onAddExercise(plan.id, "Sábado", exercise);
+            onAddExercise(plan.id, "Domingo", exercise);
           }
         }}
-        dayName={addExerciseDay || "Lunes"}
+        dayName={"Lunes"}
       />
     </div>
   );

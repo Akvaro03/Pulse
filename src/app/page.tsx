@@ -38,7 +38,7 @@ export default function HomePage() {
               />
             )}
           </div>
-
+ 
           {/* Plans management - sidebar */}
           <div className="lg:col-span-2">
             {plans && !isLoading && (
